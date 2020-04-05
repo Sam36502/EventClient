@@ -3,8 +3,10 @@ package ch.pearcenet.eventclient;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
 import java.util.HashMap;
+import java.util.List;
 
 import ch.pearcenet.tui.input.*;
 
@@ -44,7 +46,6 @@ public class Main {
         System.out.println("VERSION: " + CLIENT_VERSION);
         System.out.println("CREATOR: " + CLIENT_AUTHOR + System.lineSeparator());
 
-        // Input Config
         Input.openScanner();
         Input.setPrompt(" > ");
 
@@ -56,17 +57,17 @@ public class Main {
         while (isRunning) {
 
             // Main Menu
-            System.out.println(" Main Menu:" + System.lineSeparator() +
+            System.out.println(System.lineSeparator() +
+                    " Main Menu:" + System.lineSeparator() +
                     "------------" + System.lineSeparator() +
                     " 1) Search people" + System.lineSeparator() +
                     " 2) Show upcoming birthdays" + System.lineSeparator() +
                     " 3) Add person" + System.lineSeparator() +
-                    " 4) Update person" + System.lineSeparator() +
-                    " 5) Delete person" + System.lineSeparator() +
-                    " 6) Settings" + System.lineSeparator() +
-                    " 7) Quit"
+                    " 4) Settings" + System.lineSeparator() +
+                    " 5) Quit"
             );
-            switch (Input.getInt(1, 7)) {
+            int opt = Input.getInt(1, 5);
+            switch (opt) {
                 case 1:
                     searchPerson();
                     break;
@@ -80,18 +81,10 @@ public class Main {
                     break;
 
                 case 4:
-                    updatePerson();
-                    break;
-
-                case 5:
-                    deletePerson();
-                    break;
-
-                case 6:
                     settingsMenu();
                     break;
 
-                case 7:
+                case 5:
                     isRunning = false;
                     continue;
             }
@@ -114,41 +107,163 @@ public class Main {
      */
     private static void searchPerson() {
 
+        System.out.println(System.lineSeparator() +
+                "First name to search by (blank for none):");
+        String firstname = Input.getString();
+
+        System.out.println(System.lineSeparator() +
+                "Last name to search by (blank for none):");
+        String lastname = Input.getString();
+
+        System.out.println(System.lineSeparator() +
+                "Date of birth to search by (blank for none) [YYYY-MM-DD]:");
+
+        // Validate date format
+        LocalDate date = null;
+        boolean isValid = false;
+        while (!isValid) {
+            isValid = true;
+            String input = Input.getString();
+            if (input.length() < 1) {
+                date = null;
+                continue;
+            }
+
+            try {
+                date = LocalDate.parse(input);
+            } catch (DateTimeParseException e) {
+                System.out.println("Only dates matching the format YYYY-MM-DD or nothing are allowed.");
+                isValid = false;
+            }
+        }
+
+        // Send search to endpoint
+        System.out.print("Searching...");
+        if (firstname.length() < 1) firstname = null;
+        if (lastname.length() < 1) lastname = null;
+        List<Person> people = PersonEndpoint.read(firstname, lastname, date, -1L);
+        System.out.println("Done.");
+
+        // Display results
+        boolean inSearchMenu = true;
+        while (inSearchMenu) {
+            System.out.println(System.lineSeparator() +
+                    " Search results:" + System.lineSeparator() +
+                    "-----------------"
+            );
+            for (Person person : people)
+                System.out.println(" [" + person.getId() + "]: " + person.getFirstname() + " " + person.getLastname());
+
+            // Display Menu
+            System.out.println(System.lineSeparator() +
+                    "What would you like to do?" + System.lineSeparator() +
+                    " 1) Select a person" + System.lineSeparator() +
+                    " 2) Back to main menu"
+            );
+            int opt = Input.getInt(1, 2);
+            if (opt == 2) {
+                inSearchMenu = false;
+                continue;
+            }
+
+            // View a specific person
+            isValid = false;
+            int id = -1;
+            while (!isValid) {
+                System.out.println("Enter the ID (number in []s) of a person from the list, or -1 to return to search menu:");
+                id = Input.getInt();
+                for (Person p : people)
+                    if (id == (int) p.getId())
+                        isValid = true;
+
+            }
+            personMenu(id);
+
+        }
+    }
+
+    /**
+     * In-Depth Person menu
+     */
+    private static void personMenu(long id) {
+        if (id == -1L) return;
+
+        // Display person info
+        Person person = PersonEndpoint.readById(id);
+        System.out.println(System.lineSeparator() +
+                " Person Menu:" + System.lineSeparator() +
+                "--------------" + System.lineSeparator() +
+                " Database ID  : " + person.getId() + System.lineSeparator() +
+                " First Name   : " + person.getFirstname() + System.lineSeparator() +
+                " Last Name    : " + person.getLastname() + System.lineSeparator() +
+                " Date of Birth: " + person.getDate().format(
+                        DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
+                " Entry Created: " + person.getCreatedOn().format(
+                        DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) + System.lineSeparator()
+        );
+
+        // Person Menu
+        boolean onPersonMenu = true;
+        while (onPersonMenu) {
+
+            System.out.println(System.lineSeparator() +
+                    "What would you like to do?:" + System.lineSeparator() +
+                    " 1) Edit person" + System.lineSeparator() +
+                    " 2) Delete person" + System.lineSeparator() +
+                    " 3) Return to search"
+            );
+            int opt = Input.getInt(1, 3);
+            switch (opt) {
+                case 1:
+                    updatePerson(id);
+                    break;
+
+                case 2:
+                    deletePerson(id);
+                    break;
+
+                case 3:
+                    onPersonMenu = false;
+                    break;
+            }
+
+        }
+
     }
 
     /**
      * Interactive list of upcoming birthdays
      */
     private static void showBirthdays() {
-
+        System.out.println("Unfinished!");
     }
 
     /**
      * Interactive dialogue to create a new person
      */
     private static void createPerson() {
-
+        System.out.println("Unfinished!");
     }
 
     /**
      * Interactive dialogue to update an existing person
      */
-    private static void updatePerson() {
-
+    private static void updatePerson(long id) {
+        System.out.println("Unfinished!");
     }
 
     /**
      * Interactive dialogue to delete and existing person
      */
-    private static void deletePerson() {
-
+    private static void deletePerson(long id) {
+        System.out.println("Unfinished!");
     }
 
     /**
      * Interactive menu to change settings
      */
     private static void settingsMenu() {
-
+        System.out.println("Unfinished!");
     }
 
     /**
@@ -188,6 +303,10 @@ public class Main {
             System.exit(1);
         }
         else System.out.println(message);
+    }
+
+    private static void cls() {
+
     }
 
 }

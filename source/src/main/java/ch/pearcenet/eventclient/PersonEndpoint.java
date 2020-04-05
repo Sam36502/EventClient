@@ -54,6 +54,7 @@ public class PersonEndpoint {
         if (firstname != null) params.put(Main.settingsMap.get("api.person.firstname"), firstname);
         if (lastname != null) params.put(Main.settingsMap.get("api.person.lastname"), lastname);
         if (date != null) params.put(Main.settingsMap.get("api.person.dateofbirth"), date.format(DateTimeFormatter.ISO_LOCAL_DATE));
+        if (id != -1L) params.put(Main.settingsMap.get("api.person.id"), "" + id);
 
         // Send request
         String response = RequestHandler.sendRequest("GET", PERSON_URL, params);
@@ -96,6 +97,7 @@ public class PersonEndpoint {
 
     public static Person readById(long id) {
         List<Person> people = read(null, null, null, id);
+        for (Person p: people) System.out.println(p.getFirstname());
         if (people.size() > 0)
             return people.get(0);
         else
