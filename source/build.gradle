@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'ch.pearcenet.eventclient'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'lib'
+    }
+}
+
+dependencies {
+    compile 'org.json:json:20171018'
+    compile files('lib/SimpleTUI_2.1.0.jar')
+}
