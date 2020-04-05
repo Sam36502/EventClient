@@ -193,12 +193,13 @@ public class Main {
         System.out.println(System.lineSeparator() +
                 " Person Menu:" + System.lineSeparator() +
                 "--------------" + System.lineSeparator() +
-                " Database ID  : " + person.getId() + System.lineSeparator() +
-                " First Name   : " + person.getFirstname() + System.lineSeparator() +
-                " Last Name    : " + person.getLastname() + System.lineSeparator() +
-                " Date of Birth: " + person.getDate().format(
+                "   Database ID : " + person.getId() + System.lineSeparator() +
+                "    First Name : " + person.getFirstname() + System.lineSeparator() +
+                "     Last Name : " + person.getLastname() + System.lineSeparator() +
+                "           Age : " + person.getDate().until(LocalDate.now()).getYears() + System.lineSeparator() +
+                " Date of Birth : " + person.getDate().format(
                         DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
-                " Entry Created: " + person.getCreatedOn().format(
+                " Entry Created : " + person.getCreatedOn().format(
                         DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) + System.lineSeparator()
         );
 
