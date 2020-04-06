@@ -2,9 +2,11 @@ package ch.pearcenet.eventclient;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -230,7 +232,69 @@ public class Main {
      * Interactive list of upcoming birthdays
      */
     private static void showBirthdays() {
-        System.out.println("Unfinished!");
+        Month currMonth = LocalDate.now().getMonth();
+        Month nextMonth = currMonth.plus(1);
+
+        System.out.println(System.lineSeparator() + "Showing birthdays for this month and next month:");
+        List<Person> allPeople = PersonEndpoint.readAll();
+        List<Person> people = new ArrayList<>();
+
+        // Filter out other people
+        for (Person person: allPeople) {
+            if (person.getDate().getMonth() == currMonth ||
+                    person.getDate().getMonth() == nextMonth
+            ) people.add(person);
+        }
+        people.sort(new AgeSorter());
+
+        // Display current month birthdays
+        System.out.println(System.lineSeparator() +
+                " " + currMonth.toString() + System.lineSeparator() +
+                "--" + "-".repeat(currMonth.toString().length())
+        );
+        for (Person person: people) {
+            if (person.getDate().getMonth() == currMonth)
+                System.out.println(" " +
+                        ordinal(person.getDate().getDayOfMonth()) + ": " +
+                        person.getFirstname() + " " +
+                        person.getLastname() +
+                        " - Turning " + (person.getAge() + 1)
+                );
+        }
+
+        // Display next month birthdays
+        System.out.println(System.lineSeparator() +
+                " " + nextMonth.toString() + System.lineSeparator() +
+                "--" + "-".repeat(nextMonth.toString().length())
+        );
+        for (Person person: people) {
+            if (person.getDate().getMonth() == nextMonth)
+                System.out.println(" " +
+                        ordinal(person.getDate().getDayOfMonth()) + ": " +
+                        person.getFirstname() + " " +
+                        person.getLastname() +
+                        " - Turning " + (person.getAge() + 1)
+                );
+        }
+
+    }
+
+    // Takes and integer and gives its ordinal
+    // e.g.: 1 -> 1st, 34 -> 34th
+    private static String ordinal(int num) {
+        switch (num) {
+            case 1:
+                return "1st";
+
+            case 2:
+                return "2nd";
+
+            case 3:
+                return "3rd";
+
+            default:
+                return num + "th";
+        }
     }
 
     /**

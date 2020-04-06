@@ -73,6 +73,10 @@ public class Person {
         return this;
     }
 
+    public int getAge() {
+        return this.getDate().until(LocalDate.now()).getYears();
+    }
+
     @Override
     public String toString() {
         return System.lineSeparator() +
@@ -81,10 +85,11 @@ public class Person {
                 "   Database ID : " + (this.getId() != -1L ? this.getId() : "n/a") + System.lineSeparator() +
                 "    First Name : " + this.getFirstname() + System.lineSeparator() +
                 "     Last Name : " + this.getLastname() + System.lineSeparator() +
-                "           Age : " + this.getDate().until(LocalDate.now()).getYears() + System.lineSeparator() +
+                "           Age : " + this.getAge() + System.lineSeparator() +
                 " Date of Birth : " + this.getDate().format(
                 DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
                 " Entry Created : " + (this.getCreatedOn() != null ? this.getCreatedOn().format(
                 DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) : "n/a") + System.lineSeparator();
     }
+
 }
