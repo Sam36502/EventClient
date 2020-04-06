@@ -66,10 +66,9 @@ public class Main {
                     " 2) Show upcoming birthdays" + System.lineSeparator() +
                     " 3) Add person" + System.lineSeparator() +
                     " 4) Add people from a CSV" + System.lineSeparator() +
-                    " 5) Settings" + System.lineSeparator() +
-                    " 6) Quit"
+                    " 5) Quit"
             );
-            int opt = Input.getInt(1, 6);
+            int opt = Input.getInt(1, 5);
             switch (opt) {
                 case 1:
                     searchPerson();
@@ -88,10 +87,6 @@ public class Main {
                     break;
 
                 case 5:
-                    settingsMenu();
-                    break;
-
-                case 6:
                     isRunning = false;
                     continue;
             }
@@ -484,13 +479,6 @@ public class Main {
         }
 
         PersonEndpoint.delete(id);
-    }
-
-    /**
-     * Interactive menu to change settings
-     */
-    private static void settingsMenu() {
-        System.out.println("Unfinished!");
     }
 
     /**
