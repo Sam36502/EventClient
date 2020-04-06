@@ -12,15 +12,15 @@ import java.time.format.DateTimeFormatter;
  */
 public class Person {
 
-    private long id;
+    private long id = -1L;
 
-    private String firstname;
+    private String firstname = null;
 
-    private String lastname;
+    private String lastname = null;
 
-    private LocalDate date;
+    private LocalDate date = null;
 
-    private LocalDateTime createdOn;
+    private LocalDateTime createdOn = null;
 
     public Person() {};
 
@@ -78,13 +78,13 @@ public class Person {
         return System.lineSeparator() +
                 " Person Menu:" + System.lineSeparator() +
                 "--------------" + System.lineSeparator() +
-                "   Database ID : " + this.getId() + System.lineSeparator() +
+                "   Database ID : " + (this.getId() != -1L ? this.getId() : "n/a") + System.lineSeparator() +
                 "    First Name : " + this.getFirstname() + System.lineSeparator() +
                 "     Last Name : " + this.getLastname() + System.lineSeparator() +
                 "           Age : " + this.getDate().until(LocalDate.now()).getYears() + System.lineSeparator() +
                 " Date of Birth : " + this.getDate().format(
                 DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
-                " Entry Created : " + this.getCreatedOn().format(
-                DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) + System.lineSeparator();
+                " Entry Created : " + (this.getCreatedOn() != null ? this.getCreatedOn().format(
+                DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) : "n/a") + System.lineSeparator();
     }
 }

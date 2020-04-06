@@ -34,7 +34,7 @@ public class Main {
 
         // Load settings
         System.out.print("Loading settings...");
-        settingsMap = FileHandler.getData(SETTINGS_FILE);
+        settingsMap = FileHandler.getProperties(SETTINGS_FILE);
         if (!validateSettings()) log("ERROR", System.lineSeparator() + "Settings file is invalid.");
         System.out.println("Done." + System.lineSeparator());
 
@@ -63,10 +63,11 @@ public class Main {
                     " 1) Search people" + System.lineSeparator() +
                     " 2) Show upcoming birthdays" + System.lineSeparator() +
                     " 3) Add person" + System.lineSeparator() +
-                    " 4) Settings" + System.lineSeparator() +
-                    " 5) Quit"
+                    " 4) Add people from a CSV" + System.lineSeparator() +
+                    " 5) Settings" + System.lineSeparator() +
+                    " 6) Quit"
             );
-            int opt = Input.getInt(1, 5);
+            int opt = Input.getInt(1, 6);
             switch (opt) {
                 case 1:
                     searchPerson();
@@ -81,10 +82,14 @@ public class Main {
                     break;
 
                 case 4:
-                    settingsMenu();
+                    csvMenu();
                     break;
 
                 case 5:
+                    settingsMenu();
+                    break;
+
+                case 6:
                     isRunning = false;
                     continue;
             }
@@ -226,6 +231,70 @@ public class Main {
      */
     private static void showBirthdays() {
         System.out.println("Unfinished!");
+    }
+
+    /**
+     * Interactive menu for loading people from a csv
+     */
+    private static void csvMenu() {
+        System.out.println(System.lineSeparator() + "Filename to scan:");
+        String filename = Input.getString();
+
+        System.out.println(System.lineSeparator() + "What is the row separator? (blank for newline)");
+        String rowSep = Input.getString();
+        if (rowSep.length() < 1) rowSep = System.lineSeparator() + "|\n";
+
+        System.out.println(System.lineSeparator() + "What is the column separator? (blank for ';')");
+        String colSep = Input.getString();
+        if (colSep.length() < 1) colSep = ";";
+
+        System.out.println(System.lineSeparator() + "Should the first row be ignored?");
+        boolean ignoreHeader = Input.getBool();
+
+        System.out.println(System.lineSeparator() + "File should look like similar to this:");
+        System.out.println(" 'John" + colSep + "Smith" + colSep + "1999-01-01" +
+                ((System.lineSeparator() + "|\n").equals(rowSep) ? rowSep : "") + "'"
+        );
+
+        // Confirm format
+        System.out.println("Is this correct?");
+        if (!Input.getBool()) {
+            System.out.println("Please re-organise your data and try again.");
+            return;
+        }
+
+        // Load Data
+        System.out.println("Loading Data...");
+        List<Person> people = FileHandler.loadPersonCsv(filename, rowSep, colSep, ignoreHeader);
+
+        if (people.size() < 1) {
+            System.out.println("No people could be loaded.");
+        }
+
+        // If the file only contains one person
+        if (people.size() == 1) {
+            System.out.println("Uploading person...");
+            PersonEndpoint.create(people.get(0));
+            System.out.println("Done!");
+            return;
+        }
+
+        System.out.println("First two Rows:" + System.lineSeparator() +
+                people.get(0) + System.lineSeparator() +
+                people.get(1)
+        );
+        System.out.println("Does this look correct?");
+        if (!Input.getBool()) {
+            System.out.println("Please re-organise your data and try again.");
+            return;
+        }
+
+        // Upload data
+        System.out.println("Uploading people...");
+        for (Person person: people) {
+            PersonEndpoint.create(person);
+        }
+        System.out.println("Done!");
     }
 
     /**
