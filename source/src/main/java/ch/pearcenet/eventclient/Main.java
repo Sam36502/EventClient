@@ -293,7 +293,35 @@ public class Main {
      * Interactive dialogue to delete and existing person
      */
     private static void deletePerson(long id) {
-        System.out.println("Unfinished!");
+        Person toDelete = PersonEndpoint.readById(id);
+        String fullname = toDelete.getFirstname() + " " + toDelete.getLastname();
+
+        boolean onDeleteMenu = true;
+        while (onDeleteMenu) {
+
+            // Confirmation
+            System.out.println(System.lineSeparator() +
+                    "Are you sure you want to delete " + fullname + "?");
+            boolean confirmed = Input.getBool();
+            if (!confirmed) {
+                System.out.println("Cancelling deletion...");
+                onDeleteMenu = false;
+                continue;
+            }
+
+            // Double confirmation
+            System.out.println(System.lineSeparator() +
+                    "Type their full name to confirm:");
+            String input = Input.getString();
+            if (!fullname.equals(input)) {
+                System.out.println("Cancelling deletion...");
+                onDeleteMenu = false;
+                continue;
+            }
+
+            PersonEndpoint.delete(id);
+        }
+
     }
 
     /**
