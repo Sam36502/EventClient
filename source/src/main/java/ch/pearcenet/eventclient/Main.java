@@ -137,15 +137,16 @@ public class Main {
             }
         }
 
+        // Send search to endpoint
+        System.out.println("Searching...");
+        if (firstname.length() < 1) firstname = null;
+        if (lastname.length() < 1) lastname = null;
+        List<Person> people = PersonEndpoint.read(firstname, lastname, date, -1L);
+        System.out.println("Done. Found " + people.size() + " results.");
+
         // Search result menu
         boolean inSearchMenu = true;
         while (inSearchMenu) {
-            // Send search to endpoint
-            System.out.print("Searching...");
-            if (firstname.length() < 1) firstname = null;
-            if (lastname.length() < 1) lastname = null;
-            List<Person> people = PersonEndpoint.read(firstname, lastname, date, -1L);
-            System.out.println("Done. Found " + people.size() + " results.");
 
             System.out.println(System.lineSeparator() +
                     " Search results:" + System.lineSeparator() +
@@ -178,7 +179,7 @@ public class Main {
 
             }
             personMenu(id);
-
+            people = PersonEndpoint.read(firstname, lastname, date, -1L);
         }
     }
 
@@ -231,14 +232,14 @@ public class Main {
      * Interactive dialogue to create a new person
      */
     private static void createPerson() {
-        String firstname = "-";
+        String firstname = "";
         while (firstname.length() < 1) {
             System.out.println(System.lineSeparator() +
                     "New Person's first name:");
             firstname = Input.getString();
         }
 
-        String lastname = "-";
+        String lastname = "";
         while (lastname.length() < 1) {
             System.out.println(System.lineSeparator() +
                     "New Person's last name:");
@@ -258,7 +259,7 @@ public class Main {
             try {
                 date = LocalDate.parse(input);
             } catch (DateTimeParseException e) {
-                System.out.println("Only dates matching the format YYYY-MM-DD or nothing are allowed.");
+                System.out.println("Only dates matching the format YYYY-MM-DD are allowed.");
                 isValid = false;
             }
         }
@@ -331,32 +332,25 @@ public class Main {
         Person toDelete = PersonEndpoint.readById(id);
         String fullname = toDelete.getFirstname() + " " + toDelete.getLastname();
 
-        boolean onDeleteMenu = true;
-        while (onDeleteMenu) {
-
-            // Confirmation
-            System.out.println(System.lineSeparator() +
-                    "Are you sure you want to delete " + fullname + "?");
-            boolean confirmed = Input.getBool();
-            if (!confirmed) {
-                System.out.println("Cancelling deletion...");
-                onDeleteMenu = false;
-                continue;
-            }
-
-            // Double confirmation
-            System.out.println(System.lineSeparator() +
-                    "Type their full name to confirm:");
-            String input = Input.getString();
-            if (!fullname.equals(input)) {
-                System.out.println("Cancelling deletion...");
-                onDeleteMenu = false;
-                continue;
-            }
-
-            PersonEndpoint.delete(id);
+        // Confirmation
+        System.out.println(System.lineSeparator() +
+                "Are you sure you want to delete " + fullname + "?");
+        boolean confirmed = Input.getBool();
+        if (!confirmed) {
+            System.out.println("Cancelling deletion...");
+            return;
         }
 
+        // Double confirmation
+        System.out.println(System.lineSeparator() +
+                "Type their full name to confirm:");
+        String input = Input.getString();
+        if (!fullname.equals(input)) {
+            System.out.println("Cancelling deletion...");
+            return;
+        }
+
+        PersonEndpoint.delete(id);
     }
 
     /**
