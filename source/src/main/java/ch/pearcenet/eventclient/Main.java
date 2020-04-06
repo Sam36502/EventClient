@@ -137,16 +137,16 @@ public class Main {
             }
         }
 
-        // Send search to endpoint
-        System.out.print("Searching...");
-        if (firstname.length() < 1) firstname = null;
-        if (lastname.length() < 1) lastname = null;
-        List<Person> people = PersonEndpoint.read(firstname, lastname, date, -1L);
-        System.out.println("Done.");
-
-        // Display results
+        // Search result menu
         boolean inSearchMenu = true;
         while (inSearchMenu) {
+            // Send search to endpoint
+            System.out.print("Searching...");
+            if (firstname.length() < 1) firstname = null;
+            if (lastname.length() < 1) lastname = null;
+            List<Person> people = PersonEndpoint.read(firstname, lastname, date, -1L);
+            System.out.println("Done. Found " + people.size() + " results.");
+
             System.out.println(System.lineSeparator() +
                     " Search results:" + System.lineSeparator() +
                     "-----------------"
@@ -188,24 +188,12 @@ public class Main {
     private static void personMenu(long id) {
         if (id == -1L) return;
 
-        // Display person info
         Person person = PersonEndpoint.readById(id);
-        System.out.println(System.lineSeparator() +
-                " Person Menu:" + System.lineSeparator() +
-                "--------------" + System.lineSeparator() +
-                "   Database ID : " + person.getId() + System.lineSeparator() +
-                "    First Name : " + person.getFirstname() + System.lineSeparator() +
-                "     Last Name : " + person.getLastname() + System.lineSeparator() +
-                "           Age : " + person.getDate().until(LocalDate.now()).getYears() + System.lineSeparator() +
-                " Date of Birth : " + person.getDate().format(
-                        DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
-                " Entry Created : " + person.getCreatedOn().format(
-                        DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) + System.lineSeparator()
-        );
 
         // Person Menu
         boolean onPersonMenu = true;
         while (onPersonMenu) {
+            System.out.println(person);
 
             System.out.println(System.lineSeparator() +
                     "What would you like to do?:" + System.lineSeparator() +
@@ -216,7 +204,7 @@ public class Main {
             int opt = Input.getInt(1, 3);
             switch (opt) {
                 case 1:
-                    updatePerson(id);
+                    person = updatePerson(id);
                     break;
 
                 case 2:
@@ -249,8 +237,56 @@ public class Main {
     /**
      * Interactive dialogue to update an existing person
      */
-    private static void updatePerson(long id) {
-        System.out.println("Unfinished!");
+    private static Person updatePerson(long id) {
+
+        Person updated = PersonEndpoint.readById(id);
+        boolean confirmed = false;
+        while (!confirmed) {
+            System.out.println(System.lineSeparator() +
+                    "Person's new first name (blank to leave unchanged):");
+            String firstname = Input.getString();
+
+            System.out.println(System.lineSeparator() +
+                    "Person's new last name (blank to leave unchanged):");
+            String lastname = Input.getString();
+
+            System.out.println(System.lineSeparator() +
+                    "Person's new date of birth (blank to leave unchanged) [YYYY-MM-DD]:");
+
+            // Validate date format
+            LocalDate date = null;
+            boolean isValid = false;
+            while (!isValid) {
+                isValid = true;
+                String input = Input.getString();
+                if (input.length() < 1) {
+                    date = null;
+                    continue;
+                }
+
+                try {
+                    date = LocalDate.parse(input);
+                } catch (DateTimeParseException e) {
+                    System.out.println("Only dates matching the format YYYY-MM-DD or nothing are allowed.");
+                    isValid = false;
+                }
+            }
+
+            // Create updated person
+            if (firstname.length() > 0) updated.setFirstname(firstname);
+            if (lastname.length() > 0) updated.setLastname(lastname);
+            if (date != null) updated.setDate(date);
+
+            System.out.println(updated);
+            System.out.println(System.lineSeparator() + "Is this correct?");
+            confirmed = Input.getBool();
+        }
+
+        System.out.print("Updating...");
+        PersonEndpoint.update(id, updated.getFirstname(), updated.getLastname(), updated.getDate());
+        System.out.println("Done!");
+
+        return updated;
     }
 
     /**

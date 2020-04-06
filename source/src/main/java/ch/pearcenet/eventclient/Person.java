@@ -2,6 +2,7 @@ package ch.pearcenet.eventclient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Person Class
@@ -74,11 +75,16 @@ public class Person {
 
     @Override
     public String toString() {
-        return "Person " +this.id + ":" + System.lineSeparator() +
-                "--------------------------" + System.lineSeparator() +
-                " First Name   : " + this.firstname + System.lineSeparator() +
-                " Last Name    : " + this.lastname + System.lineSeparator() +
-                " Date of Birth: " + this.date + System.lineSeparator() +
-                " Entry Created: " + this.createdOn + System.lineSeparator();
+        return System.lineSeparator() +
+                " Person Menu:" + System.lineSeparator() +
+                "--------------" + System.lineSeparator() +
+                "   Database ID : " + this.getId() + System.lineSeparator() +
+                "    First Name : " + this.getFirstname() + System.lineSeparator() +
+                "     Last Name : " + this.getLastname() + System.lineSeparator() +
+                "           Age : " + this.getDate().until(LocalDate.now()).getYears() + System.lineSeparator() +
+                " Date of Birth : " + this.getDate().format(
+                DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
+                " Entry Created : " + this.getCreatedOn().format(
+                DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) + System.lineSeparator();
     }
 }
