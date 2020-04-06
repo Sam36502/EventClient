@@ -231,7 +231,42 @@ public class Main {
      * Interactive dialogue to create a new person
      */
     private static void createPerson() {
-        System.out.println("Unfinished!");
+        String firstname = "-";
+        while (firstname.length() < 1) {
+            System.out.println(System.lineSeparator() +
+                    "New Person's first name:");
+            firstname = Input.getString();
+        }
+
+        String lastname = "-";
+        while (lastname.length() < 1) {
+            System.out.println(System.lineSeparator() +
+                    "New Person's last name:");
+            lastname = Input.getString();
+        }
+
+        System.out.println(System.lineSeparator() +
+                "New Person's Date of birth [YYYY-MM-DD]:");
+
+        // Validate date format
+        LocalDate date = null;
+        boolean isValid = false;
+        while (!isValid) {
+            isValid = true;
+            String input = Input.getString();
+
+            try {
+                date = LocalDate.parse(input);
+            } catch (DateTimeParseException e) {
+                System.out.println("Only dates matching the format YYYY-MM-DD or nothing are allowed.");
+                isValid = false;
+            }
+        }
+
+        // Create new Person
+        System.out.println("Creating new Person...");
+        PersonEndpoint.create(new Person(firstname, lastname, date));
+        System.out.println("Done!");
     }
 
     /**
