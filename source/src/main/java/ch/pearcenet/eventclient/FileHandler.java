@@ -1,13 +1,13 @@
 package ch.pearcenet.eventclient;
 
+import jdk.vm.ci.meta.Local;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * File Handler Class
@@ -31,7 +31,7 @@ public class FileHandler {
      * @param filename The path of the file to load
      * @return HashMap containing all the key-value pairs
      */
-    public static HashMap<String, String> getData (String filename) {
+    public static HashMap<String, String> getProperties(String filename) {
 
         // Load File
         String fileContent = "";
@@ -80,7 +80,7 @@ public class FileHandler {
      * @param props HashMap of Key-Value pairs
      * @param filename Path to file to save properties to
      */
-    public static void saveData(HashMap<String, String> props, String filename) {
+    public static void saveProperties (HashMap<String, String> props, String filename) {
 
         // Generate File Contents
         String lineSep = PROP_LINESEP;
@@ -101,6 +101,45 @@ public class FileHandler {
             return;
         }
 
+    }
+
+    public static List<Person> loadPersonCsv(String filename, String rowSep, String colSep, boolean ignoreHeader) {
+
+        // Load File
+        String fileContent = "";
+        try {
+            FileInputStream fis = new FileInputStream(filename);
+            Scanner input = new Scanner(fis);
+
+            // Ignore first row if set
+            if (ignoreHeader && input.hasNextLine()) input.nextLine();
+
+            // Read each line
+            while (input.hasNextLine()) {
+                fileContent += input.nextLine() + System.lineSeparator();
+            }
+
+            input.close();
+            fis.close();
+        } catch (IOException e) {
+            Main.log("ERROR", "Failed to load data from '" + filename + "'.");
+            return null;
+        }
+
+        // Parse Data
+        List<Person> data = new ArrayList<>();
+        String[] rows = fileContent.split(rowSep);
+        for (String row: rows) {
+            String[] d = row.split(colSep);
+            if (d.length < 3) {
+                Main.log("ERROR", "File does not match format given.");
+                return null;
+            }
+
+            data.add(new Person(d[0], d[1], LocalDate.parse(d[2])));
+        }
+
+        return data;
     }
 
 }

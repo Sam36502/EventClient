@@ -2,6 +2,7 @@ package ch.pearcenet.eventclient;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Person Class
@@ -11,15 +12,15 @@ import java.time.LocalDateTime;
  */
 public class Person {
 
-    private long id;
+    private long id = -1L;
 
-    private String firstname;
+    private String firstname = null;
 
-    private String lastname;
+    private String lastname = null;
 
-    private LocalDate date;
+    private LocalDate date = null;
 
-    private LocalDateTime createdOn;
+    private LocalDateTime createdOn = null;
 
     public Person() {};
 
@@ -72,13 +73,23 @@ public class Person {
         return this;
     }
 
+    public int getAge() {
+        return this.getDate().until(LocalDate.now()).getYears();
+    }
+
     @Override
     public String toString() {
-        return "Person " +this.id + ":" + System.lineSeparator() +
-                "--------------------------" + System.lineSeparator() +
-                " First Name   : " + this.firstname + System.lineSeparator() +
-                " Last Name    : " + this.lastname + System.lineSeparator() +
-                " Date of Birth: " + this.date + System.lineSeparator() +
-                " Entry Created: " + this.createdOn + System.lineSeparator();
+        return System.lineSeparator() +
+                " Person Menu:" + System.lineSeparator() +
+                "--------------" + System.lineSeparator() +
+                "   Database ID : " + (this.getId() != -1L ? this.getId() : "n/a") + System.lineSeparator() +
+                "    First Name : " + this.getFirstname() + System.lineSeparator() +
+                "     Last Name : " + this.getLastname() + System.lineSeparator() +
+                "           Age : " + this.getAge() + System.lineSeparator() +
+                " Date of Birth : " + this.getDate().format(
+                DateTimeFormatter.ofPattern("dd MMMM, uuuu")) + System.lineSeparator() +
+                " Entry Created : " + (this.getCreatedOn() != null ? this.getCreatedOn().format(
+                DateTimeFormatter.ofPattern("dd MMMM, uuuu; HH:mm")) : "n/a") + System.lineSeparator();
     }
+
 }

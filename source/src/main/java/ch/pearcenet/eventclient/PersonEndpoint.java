@@ -118,6 +118,7 @@ public class PersonEndpoint {
 
         // Fill parameter map
         HashMap<String, String> params = new HashMap<>();
+        params.put(Main.settingsMap.get("api.person.id"), "" + id);
         if (firstname != null) params.put(Main.settingsMap.get("api.person.firstname"), firstname);
         if (lastname != null) params.put(Main.settingsMap.get("api.person.lastname"), lastname);
         if (date != null) params.put(Main.settingsMap.get("api.person.dateofbirth"), date.format(DateTimeFormatter.ISO_LOCAL_DATE));
