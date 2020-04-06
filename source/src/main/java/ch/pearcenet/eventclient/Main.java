@@ -1,5 +1,6 @@
 package ch.pearcenet.eventclient;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -11,6 +12,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import ch.pearcenet.tui.input.*;
+import org.fusesource.jansi.Ansi;
+import org.fusesource.jansi.AnsiConsole;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Main Class
@@ -22,7 +27,7 @@ public class Main {
 
     // CONSTANTS
     public static final String SETTINGS_FILE = "settings.txt";
-    public static final String CLIENT_VERSION = "v1.0";
+    public static final String CLIENT_VERSION = "v1.1";
     public static final String CLIENT_AUTHOR = "Samuel Pearce";
 
     // Global Registry
@@ -39,14 +44,7 @@ public class Main {
         settingsMap = FileHandler.getProperties(SETTINGS_FILE);
         if (!validateSettings()) log("ERROR", System.lineSeparator() + "Settings file is invalid.");
         System.out.println("Done." + System.lineSeparator());
-
-        System.out.println("  _____                 _      _    ____ ___ " + System.lineSeparator() +
-                " | ____|_   _____ _ __ | |_   / \\  |  _ \\_ _|" + System.lineSeparator() +
-                " |  _| \\ \\ / / _ \\ '_ \\| __| / _ \\ | |_) | | " + System.lineSeparator() +
-                " | |___ \\ V /  __/ | | | |_ / ___ \\|  __/| | " + System.lineSeparator() +
-                " |_____| \\_/ \\___|_| |_|\\__/_/   \\_\\_|  |___|");
-        System.out.println("VERSION: " + CLIENT_VERSION);
-        System.out.println("CREATOR: " + CLIENT_AUTHOR + System.lineSeparator());
+        AnsiConsole.systemInstall();
 
         Input.openScanner();
         Input.setPrompt(" > ");
@@ -57,6 +55,17 @@ public class Main {
 
         boolean isRunning = true;
         while (isRunning) {
+
+            System.out.println(ansi().eraseScreen().cursor(1, 1).fg(Ansi.Color.CYAN) +
+                    "  _____                 _      _    ____ ___ " + System.lineSeparator() +
+                    " | ____|_   _____ _ __ | |_   / \\  |  _ \\_ _|" + System.lineSeparator() +
+                    " |  _| \\ \\ / / _ \\ '_ \\| __| / _ \\ | |_) | | " + System.lineSeparator() +
+                    " | |___ \\ V /  __/ | | | |_ / ___ \\|  __/| | " + System.lineSeparator() +
+                    " |_____| \\_/ \\___|_| |_|\\__/_/   \\_\\_|  |___|" + System.lineSeparator() +
+                    ansi().fg(Ansi.Color.WHITE)
+            );
+            System.out.println("VERSION: " + CLIENT_VERSION);
+            System.out.println("CREATOR: " + CLIENT_AUTHOR + System.lineSeparator());
 
             // Main Menu
             System.out.println(System.lineSeparator() +
@@ -90,6 +99,7 @@ public class Main {
                     isRunning = false;
                     continue;
             }
+            System.out.println(ansi().eraseScreen().cursor(1, 1));
 
         }
 
@@ -99,6 +109,7 @@ public class Main {
         System.out.println("Quitting...");
 
         Input.closeScanner();
+        AnsiConsole.systemUninstall();
 
         System.out.println("Thank you for using EventAPI!");
 
@@ -109,7 +120,8 @@ public class Main {
      */
     private static void searchPerson() {
 
-        System.out.println(System.lineSeparator() +
+        System.out.println(ansi().eraseScreen().cursor(1, 1) +
+                System.lineSeparator() +
                 "First name to search by (blank for none):");
         String firstname = Input.getString();
 
@@ -150,8 +162,8 @@ public class Main {
         boolean inSearchMenu = true;
         while (inSearchMenu) {
 
-            System.out.println(System.lineSeparator() +
-                    " Search results:" + System.lineSeparator() +
+            System.out.println(System.lineSeparator() + ansi().eraseScreen().cursor(1, 1).fg(Ansi.Color.CYAN) +
+                    " Search results:" + System.lineSeparator() + ansi().fg(Ansi.Color.WHITE) +
                     "-----------------"
             );
             for (Person person : people)
@@ -196,7 +208,7 @@ public class Main {
         // Person Menu
         boolean onPersonMenu = true;
         while (onPersonMenu) {
-            System.out.println(person);
+            System.out.println(ansi().eraseScreen().cursor(1, 1) + "" + person);
 
             System.out.println(System.lineSeparator() +
                     "What would you like to do?:" + System.lineSeparator() +
@@ -230,7 +242,7 @@ public class Main {
         Month currMonth = LocalDate.now().getMonth();
         Month nextMonth = currMonth.plus(1);
 
-        System.out.println(System.lineSeparator() + "Showing birthdays for this month and next month:");
+        System.out.println(ansi().eraseScreen().cursor(1, 1) + System.lineSeparator() + "Showing birthdays for this month and next month:");
         List<Person> allPeople = PersonEndpoint.readAll();
         List<Person> people = new ArrayList<>();
 
@@ -244,7 +256,7 @@ public class Main {
 
         // Display current month birthdays
         System.out.println(System.lineSeparator() +
-                " " + currMonth.toString() + System.lineSeparator() +
+                " " + ansi().fg(Ansi.Color.CYAN) + currMonth.toString() + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
                 "--" + "-".repeat(currMonth.toString().length())
         );
         for (Person person: people) {
@@ -259,7 +271,7 @@ public class Main {
 
         // Display next month birthdays
         System.out.println(System.lineSeparator() +
-                " " + nextMonth.toString() + System.lineSeparator() +
+                " " + ansi().fg(Ansi.Color.CYAN) + nextMonth.toString() + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
                 "--" + "-".repeat(nextMonth.toString().length())
         );
         for (Person person: people) {
@@ -272,6 +284,10 @@ public class Main {
                 );
         }
 
+        Input.setPrompt("");
+        System.out.println("Press enter to return to main menu.");
+        Input.getString();
+        Input.setPrompt(" > ");
     }
 
     // Takes and integer and gives its ordinal
@@ -296,7 +312,8 @@ public class Main {
      * Interactive menu for loading people from a csv
      */
     private static void csvMenu() {
-        System.out.println(System.lineSeparator() + "Filename to scan:");
+        System.out.println(ansi().eraseScreen().cursor(1, 1) +
+                System.lineSeparator() + "Filename to scan:");
         String filename = Input.getString();
 
         System.out.println(System.lineSeparator() + "What is the row separator? (blank for newline)");
@@ -362,7 +379,8 @@ public class Main {
     private static void createPerson() {
         String firstname = "";
         while (firstname.length() < 1) {
-            System.out.println(System.lineSeparator() +
+            System.out.println(ansi().eraseScreen().cursor(1, 1) +
+                    System.lineSeparator() +
                     "New Person's first name:");
             firstname = Input.getString();
         }
@@ -406,7 +424,8 @@ public class Main {
         Person updated = PersonEndpoint.readById(id);
         boolean confirmed = false;
         while (!confirmed) {
-            System.out.println(System.lineSeparator() +
+            System.out.println(ansi().eraseScreen().cursor(1, 1) +
+                    System.lineSeparator() +
                     "Person's new first name (blank to leave unchanged):");
             String firstname = Input.getString();
 
@@ -465,7 +484,12 @@ public class Main {
                 "Are you sure you want to delete " + fullname + "?");
         boolean confirmed = Input.getBool();
         if (!confirmed) {
-            System.out.println("Cancelling deletion...");
+            System.out.println(ansi().fg(Ansi.Color.RED) + "Cancelling deletion..." + ansi().fg(Ansi.Color.WHITE));
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                Main.log("WARN", "Thread sleep exception occurred.");
+            }
             return;
         }
 
@@ -474,11 +498,22 @@ public class Main {
                 "Type their full name to confirm:");
         String input = Input.getString();
         if (!fullname.equals(input)) {
-            System.out.println("Cancelling deletion...");
+            System.out.println(ansi().fg(Ansi.Color.RED) + "Cancelling deletion..." + ansi().fg(Ansi.Color.WHITE));
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                Main.log("WARN", "Thread sleep exception occurred.");
+            }
             return;
         }
 
         PersonEndpoint.delete(id);
+        System.out.println(ansi().fg(Ansi.Color.RED) + "Deleting Person..." + ansi().fg(Ansi.Color.WHITE));
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException e) {
+            Main.log("WARN", "Thread sleep exception occurred.");
+        }
     }
 
     /**
