@@ -27,7 +27,7 @@ public class Main {
 
     // CONSTANTS
     public static final String SETTINGS_FILE = "settings.txt";
-    public static final String CLIENT_VERSION = "v1.1";
+    public static final String CLIENT_VERSION = "v1.2";
     public static final String CLIENT_AUTHOR = "Samuel Pearce";
 
     // Global Registry
@@ -44,8 +44,8 @@ public class Main {
         settingsMap = FileHandler.getProperties(SETTINGS_FILE);
         if (!validateSettings()) log("ERROR", System.lineSeparator() + "Settings file is invalid.");
         System.out.println("Done." + System.lineSeparator());
-        AnsiConsole.systemInstall();
 
+        AnsiConsole.systemInstall();
         Input.openScanner();
         Input.setPrompt(" > ");
 
@@ -69,7 +69,7 @@ public class Main {
 
             // Main Menu
             System.out.println(System.lineSeparator() +
-                    " Main Menu:" + System.lineSeparator() +
+                    ansi().fg(Ansi.Color.CYAN) + " Main Menu:" + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
                     "------------" + System.lineSeparator() +
                     " 1) Search people" + System.lineSeparator() +
                     " 2) Show upcoming birthdays" + System.lineSeparator() +
@@ -257,7 +257,7 @@ public class Main {
         // Display current month birthdays
         System.out.println(System.lineSeparator() +
                 " " + ansi().fg(Ansi.Color.CYAN) + currMonth.toString() + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
-                "--" + "-".repeat(currMonth.toString().length())
+                "--" + repeat("-", currMonth.toString().length())
         );
         for (Person person: people) {
             if (person.getDate().getMonth() == currMonth)
@@ -272,7 +272,7 @@ public class Main {
         // Display next month birthdays
         System.out.println(System.lineSeparator() +
                 " " + ansi().fg(Ansi.Color.CYAN) + nextMonth.toString() + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
-                "--" + "-".repeat(nextMonth.toString().length())
+                "--" + repeat("-", nextMonth.toString().length())
         );
         for (Person person: people) {
             if (person.getDate().getMonth() == nextMonth)
@@ -288,6 +288,14 @@ public class Main {
         System.out.println("Press enter to return to main menu.");
         Input.getString();
         Input.setPrompt(" > ");
+    }
+
+    private static String repeat(String str, int reps) {
+        String res = "";
+        for (int i=0; i<reps; i++) {
+            res += str;
+        }
+        return res;
     }
 
     // Takes and integer and gives its ordinal
@@ -553,10 +561,6 @@ public class Main {
             System.exit(1);
         }
         else System.out.println(message);
-    }
-
-    private static void cls() {
-
     }
 
 }

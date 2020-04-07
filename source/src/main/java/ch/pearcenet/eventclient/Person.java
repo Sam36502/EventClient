@@ -1,8 +1,12 @@
 package ch.pearcenet.eventclient;
 
+import org.fusesource.jansi.Ansi;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import static org.fusesource.jansi.Ansi.ansi;
 
 /**
  * Person Class
@@ -79,8 +83,8 @@ public class Person {
 
     @Override
     public String toString() {
-        return System.lineSeparator() +
-                " Person Menu:" + System.lineSeparator() +
+        return System.lineSeparator() + ansi().fg(Ansi.Color.CYAN) +
+                " Person Menu:" + ansi().fg(Ansi.Color.WHITE) + System.lineSeparator() +
                 "--------------" + System.lineSeparator() +
                 "   Database ID : " + (this.getId() != -1L ? this.getId() : "n/a") + System.lineSeparator() +
                 "    First Name : " + this.getFirstname() + System.lineSeparator() +
